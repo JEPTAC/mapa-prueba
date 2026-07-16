@@ -126,6 +126,29 @@
     .popup-actions button,.popup-actions a{flex:1;padding:8px 9px;border:0;border-radius:9px;text-align:center;text-decoration:none;color:#fff;background:#0a6dbb;font-size:8px;font-weight:700;cursor:pointer}
     .popup-actions .light{background:rgba(255,255,255,.1)}
 
+
+    #poi-panel{position:fixed;z-index:29;right:20px;top:88px;width:min(360px,calc(100vw - 40px));max-height:calc(100vh - 126px);padding:16px;border:1px solid var(--line);border-radius:22px;background:rgba(3,20,44,.9);backdrop-filter:blur(22px) saturate(1.2);box-shadow:var(--shadow);transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none;transition:transform .35s ease,opacity .35s ease;overflow:auto}
+    #poi-panel.open{transform:none;opacity:1;pointer-events:auto}
+    .poi-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+    .poi-panel-head span{display:block;font-size:8px;letter-spacing:.16em;color:#9bd8ff}
+    .poi-panel-head strong{display:block;margin-top:5px;font-size:17px}
+    .poi-panel-head button{width:31px;height:31px;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;background:rgba(255,255,255,.06);font-size:20px;cursor:pointer}
+    .poi-panel-copy{margin:10px 0 13px;color:rgba(255,255,255,.62);font-size:9px;line-height:1.55}
+    .poi-list{display:grid;gap:7px}
+    .poi-item{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;width:100%;padding:9px;border:1px solid rgba(255,255,255,.11);border-radius:14px;color:#fff;text-align:left;background:rgba(255,255,255,.045);cursor:pointer;transition:transform .2s ease,background .2s ease,border-color .2s ease}
+    .poi-item:hover,.poi-item.active{transform:translateX(-2px);background:rgba(255,255,255,.1);border-color:rgba(155,216,255,.4)}
+    .poi-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#1688d8,#075ea7);font-size:15px;font-weight:900}
+    .poi-copy strong{display:block;font-size:10px;line-height:1.25}.poi-copy span{display:block;margin-top:3px;color:rgba(255,255,255,.5);font-size:8px;line-height:1.35}.poi-go{font-size:16px;color:#9bd8ff}
+    .poi-panel-note{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.42);font-size:8px;line-height:1.5}
+    .poi-marker{display:flex!important;align-items:center;gap:7px;width:auto!important;height:auto!important;padding:0!important;border:0!important;background:transparent!important;filter:drop-shadow(0 8px 12px rgba(0,0,0,.38));transform:none!important}
+    .poi-pin{width:28px;height:28px;flex:0 0 auto;border:3px solid #fff;border-radius:50% 50% 50% 6px;background:#0874c9;transform:rotate(-45deg);box-shadow:0 0 0 5px rgba(8,116,201,.2)}
+    .poi-pin:after{content:"";display:block;width:7px;height:7px;margin:7px;border-radius:50%;background:#fff}
+    .poi-label{max-width:180px;padding:7px 10px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(3,20,44,.85);backdrop-filter:blur(12px);color:#fff;font-size:9px;font-weight:800;line-height:1.2;white-space:nowrap}
+    .poi-marker.compact .poi-label{display:none}
+    body.performance-lite #grain,body.performance-lite #sun-flare{display:none}
+    body.performance-lite .card,body.performance-lite .brand,body.performance-lite .toolbar,body.performance-lite #scene-info,body.performance-lite #poi-panel,body.performance-lite #explore-hud{backdrop-filter:none}
+    body.performance-lite .card{background:rgba(3,24,53,.9)}
+
     #explore-hud{display:none;position:fixed;z-index:26;left:20px;bottom:20px;width:min(345px,89vw);padding:14px 15px;border:1px solid var(--line);border-radius:18px;background:rgba(3,20,44,.76);backdrop-filter:blur(20px);box-shadow:0 15px 35px rgba(0,0,0,.2)}
     body.explore #explore-hud{display:block}
     body.explore #scroll-hint,body.explore #chapter-progress,body.explore #scene-info{opacity:0;pointer-events:none}
@@ -159,6 +182,10 @@
       #scene-info{right:10px;bottom:10px;width:205px;padding:10px}.scene-grid{display:none}
       #scroll-hint{left:31%;bottom:12px}
       #explore-hud{left:10px;bottom:10px;width:calc(100vw - 225px);min-width:150px;padding:11px}.hud-keys{display:none}
+
+      #poi-panel{right:10px;top:64px;width:calc(100vw - 20px);max-height:calc(100vh - 76px);border-radius:18px}
+      #placesBtn{display:block!important}
+      .poi-label{display:none}
       .maplibregl-ctrl-bottom-left{display:none}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.tool,.poi-marker,#loader{transition:none!important}.mouse:after{animation:none}}
@@ -188,7 +215,9 @@
     </div>
     <nav class="toolbar" aria-label="Controles del visor">
       <button class="tool view-mode active" data-view="satellite" title="Vista satelital"><span class="view-label">SATÉLITE</span><span class="view-icon">◉</span></button>
-      <button class="tool view-mode" data-view="hybrid" title="Vista híbrida"><span class="view-label">HÍBRIDA</span><span class="view-icon">⌁</span></button>
+      <button class="tool view-mode" data-view="hybrid" title="Satélite con calles y nombres"><span class="view-label">HÍBRIDA</span><span class="view-icon">⌁</span></button>
+      <button class="tool view-mode" data-view="streets" title="Mapa de calles"><span class="view-label">CALLES</span><span class="view-icon">▦</span></button>
+      <button class="tool secondary-action" id="placesBtn" title="Lugares emblemáticos">LUGARES</button>
       <button class="tool secondary-action" id="lightBtn" title="Cambiar iluminación">LUZ DÍA</button>
       <span class="separator"></span>
       <button class="tool secondary-action" id="tourBtn">RECORRIDO</button>
@@ -223,28 +252,28 @@
 
     <section class="chapter" data-scene="2">
       <article class="card">
-        <div class="chapter-kicker">Centro institucional</div>
-        <h2>Parque, iglesia y gobierno.</h2>
-        <p>Los puntos de interés se cargan desde OpenStreetMap cuando están disponibles y se complementan con referencias controladas. Cada marcador permite acercarse, abrir la ubicación y consultar una zona 360°.</p>
-        <div class="chips"><span class="chip">Puntos interactivos</span><span class="chip">Vuelo automático</span><span class="chip">Acceso 360°</span></div>
+        <div class="chapter-kicker">Corazón de San Pedro</div>
+        <h2>Parque redondo y Monumento a la Música.</h2>
+        <p>La cámara se acerca al parque principal, reconocido por su trazado circular y por el monumento que representa la tradición musical del municipio. Desde aquí puedes abrir las calles, el satélite o la vista 360°.</p>
+        <div class="chips"><span class="chip">Parque principal</span><span class="chip">Monumento a la Música</span><span class="chip">Vista de calles</span></div>
       </article>
     </section>
 
     <section class="chapter right" data-scene="3">
       <article class="card">
-        <div class="chapter-kicker">Valle y montaña</div>
-        <h2>El territorio más allá del casco urbano.</h2>
-        <p>La escena se abre hacia la transición entre el valle agrícola y las elevaciones orientales. El relieve no es decorativo: se genera a partir de un modelo digital de elevación y responde a la perspectiva de la cámara.</p>
-        <div class="chips"><span class="chip">Perspectiva aérea</span><span class="chip">Horizon fog</span><span class="chip">Terreno 3D</span></div>
+        <div class="chapter-kicker">Patrimonio religioso</div>
+        <h2>Parroquia San Pedro Apóstol.</h2>
+        <p>El recorrido desciende hasta el entorno inmediato de la iglesia, junto al parque. La vista de calles permite reconocer las manzanas, los accesos y las cubiertas reales del centro urbano sin cargar una maqueta pesada.</p>
+        <div class="chips"><span class="chip">Iglesia parroquial</span><span class="chip">Casas y manzanas</span><span class="chip">Acercamiento cinematográfico</span></div>
       </article>
     </section>
 
     <section class="chapter bottom" data-scene="4">
       <article class="card">
-        <div class="chapter-kicker">Exploración libre</div>
-        <h2>Ahora el territorio es navegable.</h2>
-        <p>Activa el modo Explorar para controlar la cámara, girar 360°, acercarte a las edificaciones y recorrer libremente el municipio. En dispositivos móviles puedes usar gestos de dos dedos para inclinar y rotar.</p>
-        <div class="chips"><span class="chip">Mouse y teclado</span><span class="chip">Controles táctiles</span><span class="chip">Pantalla completa</span></div>
+        <div class="chapter-kicker">Centro administrativo</div>
+        <h2>Alcaldía y exploración libre.</h2>
+        <p>La última estación se concentra en la sede administrativa y deja habilitado el modo Explorar. Puedes cambiar entre satélite, híbrido y calles, seleccionar un lugar emblemático y acercarte directamente.</p>
+        <div class="chips"><span class="chip">Alcaldía Municipal</span><span class="chip">Navegación libre</span><span class="chip">Google Maps y 360°</span></div>
       </article>
     </section>
   </main>
@@ -254,6 +283,16 @@
   <aside id="scene-info" aria-live="polite">
     <div class="scene-title"><span id="sceneName">Vista territorial</span><span class="quality"><i id="qualityDot"></i><span id="qualityText">cargando</span></span></div>
     <div class="scene-grid"><b>Centro</b><span id="coordText">3.9956, -76.2281</span><b>Terreno</b><span id="terrainText">DEM 3D · cargando</span><b>Base</b><span id="baseText">Imagen satelital</span></div>
+  </aside>
+
+  <aside id="poi-panel" aria-label="Lugares emblemáticos de San Pedro">
+    <div class="poi-panel-head">
+      <div><span>RECORRIDO LOCAL</span><strong>Lugares emblemáticos</strong></div>
+      <button id="closePlaces" type="button" aria-label="Cerrar lugares">×</button>
+    </div>
+    <p class="poi-panel-copy">Selecciona un lugar para realizar un vuelo cinematográfico y abrir su ubicación.</p>
+    <div id="poi-list" class="poi-list"></div>
+    <div class="poi-panel-note">Los puntos centrales se cargan de inmediato. Otros sitios turísticos se consultan en segundo plano desde OpenStreetMap, sin bloquear el visor.</div>
   </aside>
 
   <aside id="explore-hud">
@@ -275,236 +314,125 @@
 (async () => {
   'use strict';
 
-  const fatal = (title, copy, details) => {
-    const loaderEl=document.getElementById('loader');
-    const fatalEl=document.getElementById('fatal');
-    if(loaderEl) loaderEl.style.display='none';
-    document.getElementById('fatalTitle').textContent=title;
-    document.getElementById('fatalCopy').textContent=copy;
-    document.getElementById('fatalDetails').textContent=details;
-    fatalEl.style.display='grid';
-  };
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const CENTER = [-76.22805, 3.99557];
+  const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MOBILE = matchMedia('(max-width: 760px)').matches;
+  const DEVICE_MEMORY = Number(navigator.deviceMemory || 4);
+  const CPU_CORES = Number(navigator.hardwareConcurrency || 4);
+  const LOW_POWER = MOBILE || DEVICE_MEMORY <= 4 || CPU_CORES <= 4;
+  document.body.classList.toggle('performance-lite', LOW_POWER);
 
-  document.getElementById('retryBtn').addEventListener('click',()=>location.reload());
+  const fatal = (title, copy, details) => {
+    $('#loader').style.display='none';
+    $('#fatalTitle').textContent=title;
+    $('#fatalCopy').textContent=copy;
+    $('#fatalDetails').textContent=details;
+    $('#fatal').style.display='grid';
+  };
+  $('#retryBtn').addEventListener('click',()=>location.reload());
 
   const loadCss = (href, timeoutMs=10000) => new Promise((resolve,reject)=>{
-    const existing=[...document.querySelectorAll('link[rel="stylesheet"]')].find(x=>x.href===href);
-    if(existing) return resolve(href);
-    const link=document.createElement('link');
-    let settled=false;
-    const timer=setTimeout(()=>{
-      if(settled) return; settled=true; link.remove(); reject(new Error('Tiempo agotado CSS: '+href));
-    },timeoutMs);
-    link.rel='stylesheet';
-    link.href=href;
-    link.crossOrigin='anonymous';
-    link.onload=()=>{if(settled)return;settled=true;clearTimeout(timer);resolve(href)};
-    link.onerror=()=>{if(settled)return;settled=true;clearTimeout(timer);link.remove();reject(new Error('No respondió CSS: '+href))};
+    const link=document.createElement('link'); let done=false;
+    const timer=setTimeout(()=>{if(done)return;done=true;link.remove();reject(new Error('Tiempo agotado CSS: '+href));},timeoutMs);
+    link.rel='stylesheet'; link.href=href; link.crossOrigin='anonymous';
+    link.onload=()=>{if(done)return;done=true;clearTimeout(timer);resolve(href)};
+    link.onerror=()=>{if(done)return;done=true;clearTimeout(timer);link.remove();reject(new Error('No respondió CSS: '+href))};
     document.head.appendChild(link);
   });
-
   const loadScript = (src, timeoutMs=12000) => new Promise((resolve,reject)=>{
-    const script=document.createElement('script');
-    let settled=false;
-    const timer=setTimeout(()=>{
-      if(settled) return; settled=true; script.remove(); reject(new Error('Tiempo agotado JS: '+src));
-    },timeoutMs);
-    script.src=src;
-    script.crossOrigin='anonymous';
-    script.onload=()=>{if(settled)return;settled=true;clearTimeout(timer);resolve(src)};
-    script.onerror=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();reject(new Error('No respondió JS: '+src))};
-    document.head.appendChild(script);
+    const el=document.createElement('script'); let done=false;
+    const timer=setTimeout(()=>{if(done)return;done=true;el.remove();reject(new Error('Tiempo agotado JS: '+src));},timeoutMs);
+    el.src=src; el.crossOrigin='anonymous';
+    el.onload=()=>{if(done)return;done=true;clearTimeout(timer);resolve(src)};
+    el.onerror=()=>{if(done)return;done=true;clearTimeout(timer);el.remove();reject(new Error('No respondió JS: '+src))};
+    document.head.appendChild(el);
   });
-
   async function ensureMapLibre(){
-    if(window.maplibregl && typeof window.maplibregl.Map==='function') return 'precargado';
+    if(window.maplibregl?.Map) return 'precargado';
     const candidates=[
-      {js:'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js',css:'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css',name:'unpkg'},
-      {js:'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js',css:'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css',name:'jsDelivr'},
-      {js:'https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.js?v=0.1.9',css:'https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.css?v=0.1.9',name:'LocationIQ'}
+      ['jsDelivr','https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js','https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css'],
+      ['unpkg','https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js','https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css'],
+      ['LocationIQ','https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.js?v=0.1.9','https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.css?v=0.1.9']
     ];
     const errors=[];
-    for(const source of candidates){
-      try{
-        await Promise.all([loadCss(source.css),loadScript(source.js)]);
-        if(window.maplibregl && typeof window.maplibregl.Map==='function') return source.name;
-        errors.push('El archivo cargó sin exponer maplibregl.Map: '+source.name);
-      }catch(err){errors.push(err.message)}
+    for(const [name,js,css] of candidates){
+      try{await Promise.all([loadCss(css),loadScript(js)]);if(window.maplibregl?.Map)return name;}catch(err){errors.push(err.message)}
     }
     throw new Error(errors.join('\n'));
   }
-
-  let engineSource='';
-  try{
-    engineSource=await ensureMapLibre();
-  }catch(err){
-    fatal(
-      'No se pudo cargar el motor 3D',
-      'La página sí está publicada, pero el navegador no pudo descargar MapLibre desde ninguna de las rutas de respaldo.',
-      'URL: '+location.href+'\n'+err.message+'\n\nPrueba una recarga completa con Ctrl + F5. Esta versión no utiliza la carpeta vendor ni requiere GitHub Actions.'
-    );
-    return;
+  function webglAvailable(){
+    try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'));}catch(_){return false}
   }
 
-  const CENTER = [-76.22805, 3.99557];
-  const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const $ = (s, root=document) => root.querySelector(s);
-  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
-  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
-  const lerp = (a,b,t) => a + (b-a)*t;
-  const lerpAngle = (a,b,t) => {
-    let d = ((b-a+540)%360)-180;
-    return a+d*t;
+  let engine='';
+  try{engine=await ensureMapLibre();}catch(err){fatal('No se pudo cargar el motor del mapa','Ninguno de los servidores de respaldo respondió.',String(err));return;}
+  if(!webglAvailable()){fatal('WebGL no está disponible','Activa la aceleración por hardware del navegador.',navigator.userAgent);return;}
+
+  const loader={
+    value:7,
+    set(v,step,copy){this.value=Math.max(this.value,v);$('#loaderBar').style.width=this.value+'%';$('#loaderPct').textContent=Math.round(this.value)+'%';if(step)$('#loaderStep').textContent=step;if(copy)$('#loaderCopy').textContent=copy;},
+    done(){this.set(100,'Mapa listo',LOW_POWER?'Perfil fluido activado para este dispositivo.':'Calidad cinematográfica activada.');setTimeout(()=>$('#loader').classList.add('hidden'),350);}
   };
+  loader.set(18,'Cargando mapa base','Motor MapLibre cargado desde '+engine+'.');
 
-  const loader = {
-    value: 7,
-    set(value, step, copy){
-      this.value = Math.max(this.value, value);
-      $('#loaderBar').style.width = this.value + '%';
-      $('#loaderPct').textContent = Math.round(this.value) + '%';
-      if(step) $('#loaderStep').textContent = step;
-      if(copy) $('#loaderCopy').textContent = copy;
+  const cartoTiles = name => ['a','b','c','d'].map(s=>`https://${s}.basemaps.cartocdn.com/rastertiles/${name}/{z}/{x}/{y}${MOBILE?'':'@2x'}.png`);
+  const style={
+    version:8,
+    sources:{
+      satellite:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Imagery © Esri, Maxar, Earthstar Geographics and contributors'},
+      streets:{type:'raster',tiles:cartoTiles('voyager'),tileSize:MOBILE?256:512,maxzoom:20,attribution:'© OpenStreetMap contributors © CARTO'},
+      labels:{type:'raster',tiles:cartoTiles('light_only_labels'),tileSize:MOBILE?256:512,maxzoom:20,attribution:'© OpenStreetMap contributors © CARTO'}
     },
-    done(){
-      this.set(100,'Territorio listo','El modelo geoespacial está preparado para navegar.');
-      setTimeout(() => $('#loader').classList.add('hidden'), 520);
-    }
-  };
-
-  function isWebglSupported(){
-    if(!window.WebGLRenderingContext) return false;
-    const canvas=document.createElement('canvas');
-    try{
-      const context=canvas.getContext('webgl2') || canvas.getContext('webgl');
-      return !!(context && typeof context.getParameter==='function');
-    }catch(_err){
-      return false;
-    }
-  }
-
-  if(!isWebglSupported()){
-    fatal(
-      'WebGL no está disponible',
-      'MapLibre sí cargó, pero el navegador no pudo crear un contexto gráfico WebGL.',
-      'Motor: '+engineSource+'\nNavegador: '+navigator.userAgent+'\n\nEn Chrome abre chrome://settings/system, activa «Usar aceleración por hardware cuando esté disponible» y reinicia el navegador.'
-    );
-    return;
-  }
-
-  loader.set(15,'Cargando base satelital','Motor MapLibre cargado desde '+engineSource+'.');
-
-  const style = {
-    version: 8,
-    name: 'San Pedro Realistic 3D',
-    sources: {
-      satellite: {
-        type: 'raster',
-        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-        tileSize: 256,
-        minzoom: 0,
-        maxzoom: 19,
-        attribution: 'Imagery © Esri, Maxar, Earthstar Geographics and contributors'
-      },
-
-    },
-    layers: [
-      {
-        id: 'satellite',
-        type: 'raster',
-        source: 'satellite',
-        paint: {
-          'raster-opacity': 1,
-          'raster-saturation': -0.04,
-          'raster-contrast': 0.08,
-          'raster-brightness-min': 0.03,
-          'raster-brightness-max': 0.93,
-          'raster-fade-duration': 250
-        }
-      }
+    layers:[
+      {id:'satellite',type:'raster',source:'satellite',paint:{'raster-opacity':1,'raster-saturation':-.03,'raster-contrast':.08,'raster-brightness-min':.03,'raster-brightness-max':.94,'raster-fade-duration':LOW_POWER?0:160}},
+      {id:'streets',type:'raster',source:'streets',layout:{visibility:'none'},paint:{'raster-opacity':1,'raster-fade-duration':LOW_POWER?0:120}},
+      {id:'labels',type:'raster',source:'labels',layout:{visibility:'none'},paint:{'raster-opacity':.94,'raster-fade-duration':LOW_POWER?0:100}}
     ],
-    sky: {
-      'sky-color': '#8ec9ee',
-      'horizon-color': '#dceefe',
-      'fog-color': '#d4e4e6',
-      'sky-horizon-blend': 0.45,
-      'horizon-fog-blend': 0.68,
-      'fog-ground-blend': 0.12
-    }
+    sky:{'sky-color':'#8ec9ee','horizon-color':'#dceefe','fog-color':'#d4e4e6','sky-horizon-blend':.45,'horizon-fog-blend':.68,'fog-ground-blend':.12}
   };
 
   let map;
-  try {
-    map = new maplibregl.Map({
-    container: 'map',
-    style,
-    center: CENTER,
-    zoom: 11.4,
-    pitch: 68,
-    bearing: 24,
-    maxPitch: 85,
-    minZoom: 10,
-    maxZoom: 19,
-    antialias: true,
-    attributionControl: true,
-    fadeDuration: REDUCED_MOTION ? 0 : 250,
-    cooperativeGestures: false,
-    renderWorldCopies: false
+  try{
+    map=new maplibregl.Map({
+      container:'map',style,center:CENTER,zoom:11.45,pitch:LOW_POWER?58:67,bearing:22,
+      minZoom:10,maxZoom:19,maxPitch:LOW_POWER?72:80,antialias:!LOW_POWER,
+      attributionControl:true,fadeDuration:LOW_POWER?0:180,renderWorldCopies:false,cooperativeGestures:false,refreshExpiredTiles:false
     });
-  } catch (err) {
-    fatal(
-      'El motor 3D cargó, pero el mapa no pudo crearse',
-      'El navegador rechazó la inicialización gráfica o una opción del visor.',
-      String(err && (err.stack || err.message) || err)
-    );
-    return;
-  }
+  }catch(err){fatal('No fue posible crear el visor','El motor cargó, pero el navegador rechazó la escena.',String(err?.stack||err));return;}
 
-  map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:true,visualizePitch:true}), 'bottom-right');
-  map.addControl(new maplibregl.FullscreenControl(), 'bottom-right');
-  map.addControl(new maplibregl.ScaleControl({maxWidth:100,unit:'metric'}), 'bottom-left');
+  map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:true,visualizePitch:true}),'bottom-right');
+  map.addControl(new maplibregl.FullscreenControl(),'bottom-right');
+  map.addControl(new maplibregl.ScaleControl({maxWidth:100,unit:'metric'}),'bottom-left');
 
-  const interactionHandlers = ['dragPan','scrollZoom','boxZoom','dragRotate','keyboard','doubleClickZoom','touchZoomRotate'];
-  function setInteractions(enabled){
-    for(const name of interactionHandlers){
-      const handler = map[name];
-      if(handler && typeof handler[enabled?'enable':'disable'] === 'function') handler[enabled?'enable':'disable']();
-    }
-  }
+  const interactionHandlers=['dragPan','scrollZoom','boxZoom','dragRotate','keyboard','doubleClickZoom','touchZoomRotate'];
+  function setInteractions(on){for(const key of interactionHandlers){const h=map[key];const fn=h?.[on?'enable':'disable'];if(typeof fn==='function')fn.call(h);}}
   setInteractions(false);
 
-  let exploreMode = false;
-  let currentView = 'satellite';
-  let dusk = false;
-  let currentScene = 0;
-  let progressTarget = 0;
-  let progressSmooth = 0;
-  let lastFrame = performance.now();
-  let mapReady = false;
-  let styleReady = false;
-  let poiMarkers = [];
+  let explore=false, currentView='satellite', dusk=false, currentScene=0;
+  let terrainSourceReady=false, terrainEnabled=false, urbanReady=false, placesOpen=false;
+  const markerById=new Map(), popupById=new Map(), poiById=new Map();
 
-  const scenes = [
-    {name:'Vista territorial', center:[-76.2266,3.9974], zoom:11.55, pitch:69, bearing:21},
-    {name:'Casco urbano', center:[-76.2282,3.9957], zoom:14.05, pitch:72, bearing:-18},
-    {name:'Centro institucional', center:[-76.2280,3.99545], zoom:16.35, pitch:69, bearing:38},
-    {name:'Valle y montaña', center:[-76.1990,4.0040], zoom:12.75, pitch:78, bearing:-77},
-    {name:'Exploración libre', center:[-76.2282,3.9956], zoom:15.2, pitch:72, bearing:12}
+  const CORE_POIS=[
+    {id:'park',short:'Parque principal',name:'Parque principal de San Pedro',type:'Espacio público y cultura',icon:'◎',coords:[-76.22803,3.99550],zoom:18.0,pitch:55,bearing:20,description:'Parque de trazado circular, corazón urbano de San Pedro y entorno del Monumento a la Música.',image:'assets/san_pedro_parque.jpg'},
+    {id:'music',short:'Monumento a la Música',name:'Monumento a la Música',type:'Identidad cultural',icon:'♫',coords:[-76.22801,3.99554],zoom:18.25,pitch:52,bearing:-18,description:'Homenaje a la tradición musical sampedreña ubicado en el parque principal.',image:'assets/san_pedro_parque.jpg'},
+    {id:'church',short:'Iglesia San Pedro Apóstol',name:'Parroquia San Pedro Apóstol',type:'Patrimonio religioso',icon:'✦',coords:[-76.22825,3.99576],zoom:18.35,pitch:60,bearing:28,description:'Iglesia parroquial de una torre ubicada en el entorno inmediato de la plaza principal.'},
+    {id:'townhall',short:'Alcaldía Municipal',name:'Alcaldía Municipal de San Pedro',type:'Institucional',icon:'▤',coords:[-76.22766,3.99531],zoom:18.2,pitch:58,bearing:-34,description:'Sede administrativa municipal y punto central de atención institucional.'},
+    {id:'carrera6',short:'Carrera 6 · Avenida',name:'Carrera 6 y zona comercial',type:'Vida urbana',icon:'↕',coords:[-76.22802,3.99445],zoom:17.65,pitch:48,bearing:0,description:'Eje urbano donde se concentra una parte importante del comercio, transporte y movimiento cotidiano.'}
+  ];
+  CORE_POIS.forEach(p=>poiById.set(p.id,p));
+
+  const scenes=[
+    {name:'Vista territorial',center:[-76.2266,3.9974],zoom:11.55,pitch:LOW_POWER?55:66,bearing:21,view:'satellite'},
+    {name:'Casco urbano',center:[-76.2282,3.9957],zoom:14.45,pitch:LOW_POWER?45:59,bearing:-18,view:'hybrid'},
+    {...CORE_POIS[0],name:'Parque principal',center:CORE_POIS[0].coords,view:'streets'},
+    {...CORE_POIS[2],name:'Parroquia San Pedro Apóstol',center:CORE_POIS[2].coords,view:'streets'},
+    {...CORE_POIS[3],name:'Alcaldía Municipal',center:CORE_POIS[3].coords,view:'hybrid'}
   ];
 
-  const fallbackPOIs = [
-    {id:'park', name:'Parque principal de San Pedro', type:'Espacio público', coords:[-76.22803,3.99550], description:'Punto central del casco urbano y referencia para iniciar el recorrido peatonal.', image:'assets/san_pedro_parque.jpg'},
-    {id:'church', name:'Iglesia San Pedro Apóstol', type:'Patrimonio y cultura', coords:[-76.22825,3.99576], description:'Hito religioso y urbano localizado en el entorno inmediato del parque principal.'},
-    {id:'townhall', name:'Alcaldía Municipal', type:'Institucional', coords:[-76.22766,3.99531], description:'Punto de referencia institucional del municipio de San Pedro.'},
-    {id:'mountains', name:'Corredor rural oriental', type:'Territorio y paisaje', coords:[-76.1920,4.0060], description:'Acceso visual a la transición entre el valle agrícola y las elevaciones orientales.'}
-  ];
-
-  const chapters = $$('.chapter');
-  const progressRoot = $('#chapter-progress');
-  chapters.forEach((_,i)=>{
-    const dot=document.createElement('i');dot.className='progress-dot'+(i===0?' active':'');progressRoot.appendChild(dot);
-  });
-
+  const chapters=$$('.chapter');
+  chapters.forEach((_,i)=>{const dot=document.createElement('i');dot.className='progress-dot'+(i===0?' active':'');$('#chapter-progress').appendChild(dot);});
   function updateSceneUI(index){
     currentScene=index;
     chapters.forEach((c,i)=>c.classList.toggle('active',i===index));
@@ -512,287 +440,165 @@
     $('#sceneName').textContent=scenes[index].name;
   }
 
-  function cameraAt(progress){
-    const max = scenes.length-1;
-    const scaled = clamp(progress,0,.999999)*max;
-    const i = Math.floor(scaled);
-    const tRaw = scaled-i;
-    const t = tRaw*tRaw*(3-2*tRaw);
-    const a=scenes[i], b=scenes[Math.min(max,i+1)];
-    return {
-      center:[lerp(a.center[0],b.center[0],t),lerp(a.center[1],b.center[1],t)],
-      zoom:lerp(a.zoom,b.zoom,t),
-      pitch:lerp(a.pitch,b.pitch,t),
-      bearing:lerpAngle(a.bearing,b.bearing,t)
-    };
+  function setLayerVisible(id,on){if(map.getLayer(id))map.setLayoutProperty(id,'visibility',on?'visible':'none');}
+  async function ensureTerrain(){
+    if(terrainSourceReady||LOW_POWER&&MOBILE)return;
+    terrainSourceReady=true;
+    try{
+      map.addSource('terrain',{type:'raster-dem',url:'https://tiles.mapterhorn.com/tilejson.json',tileSize:512,maxzoom:13,encoding:'terrarium'});
+      if(!LOW_POWER) map.addLayer({id:'hillshade',type:'hillshade',source:'terrain',maxzoom:14.6,paint:{'hillshade-exaggeration':.2,'hillshade-shadow-color':'#0a1c19','hillshade-highlight-color':'#fff1c9','hillshade-accent-color':'#2c4a3c','hillshade-illumination-direction':315}},'labels');
+      updateTerrainForZoom();
+      $('#terrainText').textContent='DEM 3D · optimizado';
+    }catch(err){terrainSourceReady=false;$('#terrainText').textContent='Relieve · satelital';console.warn('Terrain:',err);}
+  }
+  function updateTerrainForZoom(){
+    if(!terrainSourceReady)return;
+    const shouldEnable=map.getZoom()<14.7 && !MOBILE;
+    if(shouldEnable&&!terrainEnabled){map.setTerrain({source:'terrain',exaggeration:LOW_POWER?.62:.92});terrainEnabled=true;}
+    else if(!shouldEnable&&terrainEnabled){map.setTerrain(null);terrainEnabled=false;}
+    if(map.getLayer('hillshade'))setLayerVisible('hillshade',shouldEnable&&currentView!=='streets');
   }
 
-  function updateScrollTarget(){
-    const max=document.documentElement.scrollHeight-innerHeight;
-    progressTarget=max?scrollY/max:0;
-    const idx=clamp(Math.round(progressTarget*(scenes.length-1)),0,scenes.length-1);
-    if(idx!==currentScene) updateSceneUI(idx);
-    $('#scroll-hint').style.opacity = scrollY > innerHeight*.45 ? '.25' : '1';
+  async function ensureUrbanLayers(){
+    if(urbanReady||LOW_POWER)return;
+    urbanReady=true;
+    try{
+      map.addSource('ofm',{type:'vector',url:'https://tiles.openfreemap.org/planet',attribution:'© OpenStreetMap contributors · OpenFreeMap'});
+      map.addLayer({id:'roads-shadow',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.5,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':'rgba(3,18,32,.65)','line-width':['interpolate',['linear'],['zoom'],13.5,1,17,8],'line-blur':1,'line-opacity':.45}},'labels');
+      map.addLayer({id:'roads',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.5,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':['match',['get','class'],['motorway','trunk','primary','secondary'],'#f4dfaa','#ece7dc'],'line-width':['interpolate',['linear'],['zoom'],13.5,.5,17,4.2],'line-opacity':.78}},'labels');
+      map.addLayer({id:'buildings-3d',type:'fill-extrusion',source:'ofm','source-layer':'building',minzoom:15.25,layout:{visibility:'none'},paint:{'fill-extrusion-color':'#ddd0c1','fill-extrusion-height':['coalesce',['to-number',['get','render_height']],['*',['coalesce',['to-number',['get','levels']],2],3],5.5],'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],0],'fill-extrusion-opacity':['interpolate',['linear'],['zoom'],15.25,0,16,.68,18,.88],'fill-extrusion-vertical-gradient':true}});
+      applyViewLayers();
+    }catch(err){urbanReady=false;console.warn('Urban layers:',err);}
   }
-  addEventListener('scroll',updateScrollTarget,{passive:true});
-  updateScrollTarget();
 
-  function renderLoop(now){
-    requestAnimationFrame(renderLoop);
-    const dt=Math.min(.05,(now-lastFrame)/1000);lastFrame=now;
-    if(mapReady && !exploreMode){
-      const speed=REDUCED_MOTION?1:clamp(dt*4.4,0,1);
-      progressSmooth += (progressTarget-progressSmooth)*speed;
-      const cam=cameraAt(progressSmooth);
-      map.jumpTo(cam);
-      $('#coordText').textContent=`${cam.center[1].toFixed(4)}, ${cam.center[0].toFixed(4)}`;
+  function applyViewLayers(){
+    const sat=currentView==='satellite', hybrid=currentView==='hybrid', streets=currentView==='streets';
+    setLayerVisible('satellite',!streets);
+    setLayerVisible('streets',streets);
+    setLayerVisible('labels',hybrid);
+    if(map.getLayer('satellite')){
+      map.setPaintProperty('satellite','raster-saturation',hybrid?-.13:-.03);
+      map.setPaintProperty('satellite','raster-contrast',hybrid?.13:.08);
+      map.setPaintProperty('satellite','raster-brightness-max',dusk?.73:(hybrid?.84:.94));
     }
+    const showVectors=urbanReady&&(hybrid||streets);
+    setLayerVisible('roads-shadow',showVectors&&map.getZoom()>=14.2);
+    setLayerVisible('roads',showVectors&&map.getZoom()>=14.2);
+    setLayerVisible('buildings-3d',urbanReady&&map.getZoom()>=15.25);
+    $('#baseText').textContent=streets?'Calles y edificaciones':hybrid?'Satélite + nombres':'Imagen satelital';
+    updateTerrainForZoom();
   }
-  requestAnimationFrame(renderLoop);
-
-  function addOptionalGeoSources(){
-    if(!map.getSource('terrain')){
-      map.addSource('terrain',{
-        type:'raster-dem',
-        url:'https://tiles.mapterhorn.com/tilejson.json',
-        tileSize:512,
-        maxzoom:14,
-        encoding:'terrarium'
-      });
-      map.addLayer({
-        id:'hillshade',type:'hillshade',source:'terrain',
-        paint:{
-          'hillshade-exaggeration':0.34,
-          'hillshade-shadow-color':'#0a1c19',
-          'hillshade-highlight-color':'#fff1c9',
-          'hillshade-accent-color':'#2c4a3c',
-          'hillshade-illumination-direction':315
-        }
-      });
-      map.setTerrain({source:'terrain',exaggeration:1.25});
-    }
-    if(!map.getSource('ofm')){
-      map.addSource('ofm',{
-        type:'vector',
-        url:'https://tiles.openfreemap.org/planet',
-        attribution:'© OpenStreetMap contributors · OpenFreeMap'
-      });
-    }
-  }
-
-  function addProfessionalLayers(){
-    if(!map.getSource('ofm')) return;
-
-    map.addLayer({
-      id:'agriculture-tint', type:'fill', source:'ofm', 'source-layer':'landcover', minzoom:10,
-      filter:['match',['get','class'],['farmland','grass','wood'],true,false],
-      paint:{'fill-color':['match',['get','class'],'wood','#356c45','farmland','#6d9350','#527944'],'fill-opacity':['interpolate',['linear'],['zoom'],10,.05,14,.12,17,.04]}
-    }, map.getLayer('hillshade') ? 'hillshade' : undefined);
-
-    map.addLayer({
-      id:'road-corridor-shadow', type:'line', source:'ofm', 'source-layer':'transportation', minzoom:11,
-      filter:['match',['get','class'],['motorway','trunk','primary','secondary','tertiary'],true,false],
-      layout:{'line-cap':'round','line-join':'round'},
-      paint:{'line-color':'rgba(4,18,30,.68)','line-width':['interpolate',['linear'],['zoom'],11,1.2,15,6,18,15],'line-blur':1.4,'line-opacity':['interpolate',['linear'],['zoom'],11,.2,15,.55]}
-    });
-
-    map.addLayer({
-      id:'road-corridor', type:'line', source:'ofm', 'source-layer':'transportation', minzoom:11,
-      filter:['match',['get','class'],['motorway','trunk','primary','secondary','tertiary'],true,false],
-      layout:{'line-cap':'round','line-join':'round'},
-      paint:{
-        'line-color':['match',['get','class'],['motorway','trunk'],'#ead8a8',['primary','secondary'],'#f1ead7','#d6d6d2'],
-        'line-width':['interpolate',['linear'],['zoom'],11,.55,15,2.5,18,7],
-        'line-opacity':['interpolate',['linear'],['zoom'],11,.35,14,.68,18,.9]
-      }
-    });
-
-    map.addLayer({
-      id:'local-roads', type:'line', source:'ofm', 'source-layer':'transportation', minzoom:14,
-      filter:['match',['get','class'],['minor','service','path'],true,false],
-      layout:{'line-cap':'round','line-join':'round'},
-      paint:{'line-color':'#e3dfd2','line-width':['interpolate',['linear'],['zoom'],14,.35,18,3.4],'line-opacity':['interpolate',['linear'],['zoom'],14,.15,17,.6]}
-    });
-
-    map.addLayer({
-      id:'buildings-3d', type:'fill-extrusion', source:'ofm', 'source-layer':'building', minzoom:13.8,
-      paint:{
-        'fill-extrusion-color':[
-          'interpolate',['linear'],['get','render_height'],
-          0,'#e9dfd3',8,'#d9c6b2',18,'#c8b19c',40,'#b7a38e'
-        ],
-        'fill-extrusion-height':['coalesce',['to-number',['get','render_height']],['*',['coalesce',['to-number',['get','levels']],2],3],6],
-        'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],0],
-        'fill-extrusion-opacity':['interpolate',['linear'],['zoom'],13.8,0,14.5,.72,16,.92],
-        'fill-extrusion-vertical-gradient':true
-      }
-    });
-
-    map.addLayer({
-      id:'building-roofs', type:'line', source:'ofm', 'source-layer':'building', minzoom:16,
-      paint:{'line-color':'rgba(255,244,225,.52)','line-width':.55,'line-opacity':['interpolate',['linear'],['zoom'],16,.2,18,.55]}
-    });
-  }
-
-  function setView(mode){
+  async function setView(mode){
     currentView=mode;
     $$('.view-mode').forEach(b=>b.classList.toggle('active',b.dataset.view===mode));
-    const hybrid=mode==='hybrid';
-    if(map.getLayer('satellite')){
-      map.setPaintProperty('satellite','raster-saturation',hybrid?-.18:-.04);
-      map.setPaintProperty('satellite','raster-contrast',hybrid?.14:.08);
-      map.setPaintProperty('satellite','raster-brightness-max',hybrid?.83:.93);
-    }
-    for(const id of ['road-corridor-shadow','road-corridor','local-roads','buildings-3d','building-roofs']){
-      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility',hybrid?'visible':(id==='buildings-3d'||id==='building-roofs'?'visible':'none'));
-    }
-    $('#baseText').textContent=hybrid?'Satélite + cartografía':'Imagen satelital';
+    if(mode!=='satellite')await ensureUrbanLayers();
+    applyViewLayers();
   }
   $$('.view-mode').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
 
-  function setLight(nextDusk){
-    dusk=nextDusk;
-    $('#lightBtn').textContent=dusk?'LUZ TARDE':'LUZ DÍA';
-    $('#sun-flare').style.opacity=dusk?'.28':'.16';
-    if(typeof map.setSky==='function') map.setSky(dusk?{
-      'sky-color':'#536e91','horizon-color':'#f1b58b','fog-color':'#d2b7a9','sky-horizon-blend':.53,'horizon-fog-blend':.72,'fog-ground-blend':.13
-    }:{
-      'sky-color':'#8ec9ee','horizon-color':'#dceefe','fog-color':'#d4e4e6','sky-horizon-blend':.45,'horizon-fog-blend':.68,'fog-ground-blend':.12
-    });
-    if(map.getLayer('satellite')){
-      map.setPaintProperty('satellite','raster-brightness-max',dusk?.72:(currentView==='hybrid'?.83:.93));
-      map.setPaintProperty('satellite','raster-hue-rotate',dusk?8:0);
-    }
-    if(map.getLayer('hillshade')) map.setPaintProperty('hillshade','hillshade-illumination-direction',dusk?285:315);
+  function setLight(on){
+    dusk=on;$('#lightBtn').textContent=dusk?'LUZ TARDE':'LUZ DÍA';$('#sun-flare').style.opacity=dusk?'.25':'.13';
+    if(typeof map.setSky==='function')map.setSky(dusk?{'sky-color':'#536e91','horizon-color':'#f1b58b','fog-color':'#d2b7a9','sky-horizon-blend':.53,'horizon-fog-blend':.72,'fog-ground-blend':.13}:{'sky-color':'#8ec9ee','horizon-color':'#dceefe','fog-color':'#d4e4e6','sky-horizon-blend':.45,'horizon-fog-blend':.68,'fog-ground-blend':.12});
+    applyViewLayers();
   }
   $('#lightBtn').addEventListener('click',()=>setLight(!dusk));
 
   function setExplore(on){
-    exploreMode=on;
-    document.body.classList.toggle('explore',on);
-    $('#exploreBtn').classList.toggle('active',on);
-    setInteractions(on);
-    if(on){
-      map.easeTo({...scenes[4],duration:REDUCED_MOTION?0:1300,essential:true});
-      $('#exploreBtn').textContent='EXPLORANDO';
-    }else{
-      $('#exploreBtn').textContent='EXPLORAR';
-      updateScrollTarget();
-    }
+    explore=on;document.body.classList.toggle('explore',on);$('#exploreBtn').classList.toggle('active',on);setInteractions(on);
+    $('#exploreBtn').textContent=on?'EXPLORANDO':'EXPLORAR';
+    if(on){setView('hybrid');map.easeTo({center:CENTER,zoom:15.35,pitch:LOW_POWER?38:58,bearing:8,duration:REDUCED_MOTION?0:1000,essential:true});}
   }
-  $('#exploreBtn').addEventListener('click',()=>setExplore(!exploreMode));
-  $('#tourBtn').addEventListener('click',()=>{setExplore(false);scrollTo({top:0,behavior:REDUCED_MOTION?'auto':'smooth'});});
+  $('#exploreBtn').addEventListener('click',()=>setExplore(!explore));
   $('#exitExplore').addEventListener('click',()=>setExplore(false));
-  addEventListener('keydown',e=>{if(e.key==='Escape'&&exploreMode)setExplore(false)});
+  $('#tourBtn').addEventListener('click',()=>{setExplore(false);scrollTo({top:0,behavior:REDUCED_MOTION?'auto':'smooth'});});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&explore)setExplore(false)});
 
-  function popupHTML(poi){
-    const photo=poi.image?`<div class="popup-photo" style="background-image:url('${poi.image}')"></div>`:'';
-    const pano=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${poi.coords[1]},${poi.coords[0]}`;
-    const maps=`https://www.google.com/maps/search/?api=1&query=${poi.coords[1]},${poi.coords[0]}`;
-    return `<div class="popup">${photo}<div class="popup-body"><div class="popup-type">${poi.type}</div><h3>${poi.name}</h3><p>${poi.description||'Punto de interés dentro de la experiencia territorial.'}</p><div class="popup-actions"><button data-fly="${poi.coords.join(',')}">ACERCAR</button><a class="light" href="${pano}" target="_blank" rel="noopener">VER 360°</a></div></div></div>`;
+  function mapsUrl(p){return `https://www.google.com/maps/search/?api=1&query=${p.coords[1]},${p.coords[0]}`;}
+  function panoUrl(p){return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.coords[1]},${p.coords[0]}`;}
+  function popupHTML(p){
+    const photo=p.image?`<div class="popup-photo" style="background-image:url('${p.image}')"></div>`:'';
+    return `<div class="popup">${photo}<div class="popup-body"><div class="popup-type">${p.type}</div><h3>${p.name}</h3><p>${p.description}</p><div class="popup-actions"><button data-poi-focus="${p.id}">ACERCAR</button><a class="light" href="${mapsUrl(p)}" target="_blank" rel="noopener">MAPS</a><a class="light" href="${panoUrl(p)}" target="_blank" rel="noopener">360°</a></div></div></div>`;
   }
+  function createMarker(p){
+    if(markerById.has(p.id))return;
+    const el=document.createElement('button');el.className='poi-marker';el.type='button';el.innerHTML='<span class="poi-pin"></span><span class="poi-label">'+p.short+'</span>';el.setAttribute('aria-label',p.name);
+    const popup=new maplibregl.Popup({offset:22,maxWidth:'270px',closeButton:true}).setHTML(popupHTML(p));
+    const marker=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(p.coords).setPopup(popup).addTo(map);
+    popup.on('open',()=>setTimeout(()=>{const btn=document.querySelector(`[data-poi-focus="${p.id}"]`);if(btn)btn.onclick=()=>focusPOI(p.id,true);},0));
+    markerById.set(p.id,marker);popupById.set(p.id,popup);
+  }
+  CORE_POIS.forEach(createMarker);
 
-  function createMarker(poi){
-    const el=document.createElement('button');el.className='poi-marker';el.type='button';el.setAttribute('aria-label',poi.name);
-    const popup=new maplibregl.Popup({offset:24,maxWidth:'260px',closeButton:true}).setHTML(popupHTML(poi));
-    const marker=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(poi.coords).setPopup(popup).addTo(map);
-    popup.on('open',()=>{
-      setTimeout(()=>{
-        const btn=document.querySelector(`[data-fly="${poi.coords.join(',')}"]`);
-        if(btn) btn.onclick=()=>map.easeTo({center:poi.coords,zoom:17.25,pitch:72,bearing:25,duration:1400,essential:true});
-      },0);
+  function renderPoiList(){
+    const list=$('#poi-list');list.innerHTML='';
+    [...poiById.values()].forEach(p=>{
+      const btn=document.createElement('button');btn.className='poi-item';btn.type='button';btn.dataset.poi=p.id;
+      btn.innerHTML=`<span class="poi-icon">${p.icon||'•'}</span><span class="poi-copy"><strong>${p.short}</strong><span>${p.type}</span></span><span class="poi-go">›</span>`;
+      btn.onclick=()=>focusPOI(p.id,true);list.appendChild(btn);
     });
-    poiMarkers.push(marker);
+  }
+  renderPoiList();
+  function togglePlaces(force){placesOpen=typeof force==='boolean'?force:!placesOpen;$('#poi-panel').classList.toggle('open',placesOpen);$('#placesBtn').classList.toggle('active',placesOpen);}
+  $('#placesBtn').addEventListener('click',()=>togglePlaces());$('#closePlaces').addEventListener('click',()=>togglePlaces(false));
+
+  async function focusPOI(id,openPopup=false){
+    const p=poiById.get(id);if(!p)return;
+    setExplore(true);await setView('streets');togglePlaces(false);
+    $$('.poi-item').forEach(x=>x.classList.toggle('active',x.dataset.poi===id));
+    map.easeTo({center:p.coords,zoom:p.zoom||17.6,pitch:LOW_POWER?34:(p.pitch??52),bearing:p.bearing??18,duration:REDUCED_MOTION?0:1250,easing:t=>1-Math.pow(1-t,3),essential:true});
+    if(openPopup)setTimeout(()=>markerById.get(id)?.togglePopup(),REDUCED_MOTION?20:900);
   }
 
-  async function queryOverpass(){
-    const bbox='3.984,-76.242,4.008,-76.214';
-    const q=`[out:json][timeout:18];(nwr[amenity=townhall](${bbox});nwr[amenity=place_of_worship](${bbox});nwr[leisure=park](${bbox});nwr[name~"Parque|Iglesia|Parroquia|Alcald",i](${bbox}););out center tags;`;
-    const endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
-    for(const url of endpoints){
+  async function focusScene(index){
+    if(explore)return;
+    updateSceneUI(index);
+    const s=scenes[index];
+    await setView(s.view||'satellite');
+    if(index>=1)ensureUrbanLayers();
+    map.easeTo({center:s.center,zoom:s.zoom,pitch:s.pitch,bearing:s.bearing,duration:REDUCED_MOTION?0:(LOW_POWER?900:1400),easing:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,essential:true});
+    if(index>=2){const id=index===2?'park':index===3?'church':'townhall';setTimeout(()=>{if(!explore&&!popupById.get(id)?.isOpen())markerById.get(id)?.togglePopup();},LOW_POWER?550:1000);}
+  }
+
+  const observer=new IntersectionObserver(entries=>{
+    const best=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+    if(!best)return;const idx=Number(best.target.dataset.scene);if(Number.isFinite(idx)&&idx!==currentScene)focusScene(idx);
+  },{threshold:[.35,.55,.7]});
+  chapters.forEach(c=>observer.observe(c));
+  addEventListener('scroll',()=>{$('#scroll-hint').style.opacity=scrollY>innerHeight*.45?'.18':'1'},{passive:true});
+
+  async function discoverExtraPOIs(){
+    const bbox='3.90,-76.32,4.06,-76.09';
+    const q=`[out:json][timeout:12];(nwr[name~"Chiquinquirá|Chiquinquira|Chancos|Altozano|Madrevieja|Playa Alta|Acuavalle",i](${bbox}););out center tags;`;
+    const endpoints=['https://overpass.kumi.systems/api/interpreter','https://overpass-api.de/api/interpreter'];
+    for(const endpoint of endpoints){
       try{
-        const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:'data='+encodeURIComponent(q)});
-        if(!r.ok) throw new Error('Overpass '+r.status);
-        const j=await r.json();
-        const found=[];
-        for(const e of j.elements||[]){
-          const lng=e.lon??e.center?.lon, lat=e.lat??e.center?.lat;
-          if(!Number.isFinite(lng)||!Number.isFinite(lat)) continue;
-          const tags=e.tags||{};const name=tags.name||'';
-          let kind='Punto de interés',id='poi',desc='Punto identificado mediante cartografía colaborativa de OpenStreetMap.';
-          if(tags.amenity==='townhall'||/alcald/i.test(name)){kind='Institucional';id='townhall'}
-          else if(tags.amenity==='place_of_worship'||/iglesia|parroquia/i.test(name)){kind='Patrimonio y cultura';id='church'}
-          else if(tags.leisure==='park'||/parque/i.test(name)){kind='Espacio público';id='park'}
-          found.push({id,name:name||kind,type:kind,coords:[lng,lat],description:desc,image:id==='park'?'assets/san_pedro_parque.jpg':undefined});
+        const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:'data='+encodeURIComponent(q)});if(!r.ok)throw new Error(String(r.status));
+        const data=await r.json();let added=0;
+        for(const e of data.elements||[]){
+          const lng=e.lon??e.center?.lon,lat=e.lat??e.center?.lat,name=e.tags?.name;if(!name||!Number.isFinite(lng)||!Number.isFinite(lat))continue;
+          const id='osm-'+e.type+'-'+e.id;if(poiById.has(id))continue;
+          const p={id,short:name,name,type:'Sitio de interés',icon:'＋',coords:[lng,lat],zoom:16.2,pitch:42,bearing:15,description:'Sitio identificado en cartografía colaborativa de OpenStreetMap.'};
+          poiById.set(id,p);createMarker(p);added++;
         }
-        if(found.length) return found;
-      }catch(err){console.warn(err)}
+        if(added)renderPoiList();return;
+      }catch(err){console.warn('Overpass background:',err)}
     }
-    return [];
   }
 
-  async function loadPOIs(){
-    let real=[];
-    try{real=await queryOverpass()}catch(err){console.warn(err)}
-    const dedupe=new Map();
-    [...real,...fallbackPOIs].forEach(p=>{if(!dedupe.has(p.id))dedupe.set(p.id,p)});
-    [...dedupe.values()].forEach(createMarker);
-    loader.set(91,'Preparando puntos interactivos',real.length?'Puntos urbanos encontrados en cartografía abierta.':'Se activaron referencias territoriales de respaldo.');
-  }
-
-  map.on('load', async () => {
-    styleReady=true;
-    loader.set(42,'Base satelital activa','La vista principal ya está disponible. Añadiendo capas 3D progresivas…');
-    try{
-      addOptionalGeoSources();
-      loader.set(58,'Construyendo relieve 3D','Aplicando modelo digital de elevación y sombreado del terreno…');
-    }catch(err){
-      console.warn('Relieve no disponible; continúa el satélite:',err);
-      $('#terrainText').textContent='DEM 3D · no disponible';
-    }
-    try{
-      addProfessionalLayers();
-      loader.set(75,'Extruyendo el casco urbano','Levantando edificios y jerarquizando vías reales…');
-    }catch(err){
-      console.warn('Capas vectoriales parciales:',err);
-    }
+  map.on('load',()=>{
+    loader.set(64,'Mapa principal listo','Activando lugares emblemáticos y controles de navegación…');
     setView('satellite');
-    await loadPOIs();
+    setTimeout(()=>ensureTerrain(),LOW_POWER?1800:500);
+    setTimeout(()=>discoverExtraPOIs(),3000);
+    loader.set(92,'Optimizando experiencia',LOW_POWER?'Se redujeron efectos y capas pesadas para mejorar la fluidez.':'Las capas avanzadas se cargarán únicamente cuando sean necesarias.');
+    loader.done();
+    $('#qualityDot').classList.add('ok');$('#qualityText').textContent=LOW_POWER?'modo fluido':'cinemático';
+    $('#terrainText').textContent=LOW_POWER&&MOBILE?'Relieve · ligero':'DEM 3D · progresivo';
   });
-
-  map.on('idle',()=>{
-    if(!mapReady){
-      mapReady=true;
-      $('#qualityDot').classList.add('ok');
-      $('#qualityText').textContent='3D activo';
-      loader.done();
-    }
-  });
-
-  let firstResourceError='';
-  map.on('error',e=>{
-    const err=e?.error||e;
-    console.warn('Map resource warning:',err);
-    if(!firstResourceError) firstResourceError=String(err?.message||err);
-    if(!styleReady) $('#qualityText').textContent='conexión parcial';
-  });
-
-  map.on('terrain',()=>{
-    const t=$('#terrainText');
-    if(t) t.textContent='DEM 3D · activo';
-  });
-
-  map.on('move',()=>{
-    if(exploreMode){const c=map.getCenter();$('#coordText').textContent=`${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}`;}
-  });
-
-  setTimeout(()=>{
-    if(!mapReady){
-      $('#qualityText').textContent='modo degradado';
-      loader.set(96,'Finalizando carga','Algunas capas externas están tardando más de lo habitual…');
-      setTimeout(()=>loader.done(),1500);
-    }
-  },12000);
+  map.on('zoomend',()=>{updateTerrainForZoom();applyViewLayers();});
+  map.on('moveend',()=>{const c=map.getCenter();$('#coordText').textContent=`${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}`;});
+  map.on('zoom',()=>{const compact=map.getZoom()<14.6;markerById.forEach(m=>m.getElement().classList.toggle('compact',compact));});
+  map.on('error',e=>console.warn('Recurso cartográfico:',e?.error||e));
 })();
 </script>
 </body>

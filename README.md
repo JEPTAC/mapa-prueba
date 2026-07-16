@@ -1,10 +1,17 @@
-# San Pedro 3D — versión GitHub Pages sin rutas vendor
+# San Pedro 3D — versión cinematográfica optimizada
+
+Proyecto estático listo para GitHub Pages.
+
+## Mejoras principales
+
+- Vuelos cinematográficos por estaciones, sin mover la cámara en cada fotograma del scroll.
+- Tres vistas: Satélite, Híbrida y Calles.
+- Panel de lugares emblemáticos: parque, Monumento a la Música, iglesia, Alcaldía y Carrera 6.
+- Marcadores con Google Maps y Street View 360°.
+- Perfil automático de rendimiento según dispositivo.
+- Relieve y edificios 3D cargados progresivamente, sin bloquear el mapa.
+- Compatible con GitHub Pages desde la raíz del repositorio.
 
 ## Publicación
 
-1. Sube `index.html`, la carpeta `assets` y `.nojekyll` a la raíz del repositorio.
-2. En **Settings → Pages**, selecciona **Deploy from a branch**, rama `main`, carpeta `/ (root)`.
-3. Espera a que GitHub termine la publicación y abre la URL.
-4. Haz una recarga completa con `Ctrl + F5`.
-
-Esta versión no necesita `vendor`, `npm`, `package.json` ni GitHub Actions. MapLibre se carga con tres CDN de respaldo y el mapa arranca primero con la capa satelital; el relieve y las edificaciones se agregan progresivamente.
+Sube a la raíz del repositorio: `index.html`, `.nojekyll` y la carpeta `assets`. En Settings → Pages selecciona `Deploy from a branch`, `main` y `/(root)`.
