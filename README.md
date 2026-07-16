@@ -1,11 +1,10 @@
-# Cartografía de San Pedro, Valle del Cauca
+# San Pedro 3D — versión GitHub Pages sin rutas vendor
 
-## Publicar en GitHub Pages
+## Publicación
 
-1. Sube **todo el contenido de esta carpeta** al repositorio, conservando `assets/` y `vendor/`.
-2. Verifica que `index.html` esté en la raíz.
-3. En GitHub abre **Settings → Pages**.
-4. Selecciona **Deploy from a branch**, la rama principal y la carpeta `/root`.
-5. Abre la URL publicada y realiza una recarga completa con `Ctrl + F5`.
+1. Sube `index.html`, la carpeta `assets` y `.nojekyll` a la raíz del repositorio.
+2. En **Settings → Pages**, selecciona **Deploy from a branch**, rama `main`, carpeta `/ (root)`.
+3. Espera a que GitHub termine la publicación y abre la URL.
+4. Haz una recarga completa con `Ctrl + F5`.
 
-La interfaz y la cartografía oficial están guardadas localmente. Las imágenes satelitales se consultan en línea y cuentan con fuentes alternativas para evitar cuadros en blanco.
+Esta versión no necesita `vendor`, `npm`, `package.json` ni GitHub Actions. MapLibre se carga con tres CDN de respaldo y el mapa arranca primero con la capa satelital; el relieve y las edificaciones se agregan progresivamente.
