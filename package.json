@@ -1,0 +1,12 @@
+{
+  "name": "san-pedro-3d",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Visor geoespacial 3D inmersivo de San Pedro, Valle del Cauca.",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "5.24.0"
+  }
+}

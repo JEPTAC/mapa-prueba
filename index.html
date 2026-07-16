@@ -7,12 +7,9 @@
   <meta name="description" content="Experiencia geoespacial 3D inmersiva de San Pedro, Valle del Cauca, con cartografía satelital, relieve real y recorrido cinematográfico." />
   <title>San Pedro 3D — Territorio real e inmersivo</title>
 
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
   <link rel="preconnect" href="https://tiles.mapterhorn.com" crossorigin>
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 
   <style>
     :root{
@@ -255,7 +252,7 @@
 
   <aside id="scene-info" aria-live="polite">
     <div class="scene-title"><span id="sceneName">Vista territorial</span><span class="quality"><i id="qualityDot"></i><span id="qualityText">cargando</span></span></div>
-    <div class="scene-grid"><b>Centro</b><span id="coordText">3.9956, -76.2281</span><b>Terreno</b><span>DEM 3D · 1.25×</span><b>Base</b><span id="baseText">Imagen satelital</span></div>
+    <div class="scene-grid"><b>Centro</b><span id="coordText">3.9956, -76.2281</span><b>Terreno</b><span id="terrainText">DEM 3D · cargando</span><b>Base</b><span id="baseText">Imagen satelital</span></div>
   </aside>
 
   <aside id="explore-hud">
@@ -265,12 +262,82 @@
   </aside>
 
   <div id="fatal">
-    <div class="fatal-card"><h2>No fue posible iniciar el visor 3D</h2><p>El archivo necesita conexión a internet y un navegador con WebGL habilitado. Ábrelo mediante un servidor local o súbelo a GitHub Pages.</p><code>python -m http.server 8080\nLuego abre: http://localhost:8080</code></div>
+    <div class="fatal-card">
+      <h2 id="fatalTitle">No fue posible iniciar el visor 3D</h2>
+      <p id="fatalCopy">El visor no pudo cargar su motor geoespacial.</p>
+      <code id="fatalDetails">Diagnóstico pendiente…</code>
+      <button id="retryBtn" type="button" style="margin-top:16px;border:0;border-radius:11px;padding:11px 16px;background:#fff;color:#082646;font-weight:800;cursor:pointer">REINTENTAR</button>
+    </div>
   </div>
 
 <script>
-(() => {
+(async () => {
   'use strict';
+
+  const fatal = (title, copy, details) => {
+    const loaderEl=document.getElementById('loader');
+    const fatalEl=document.getElementById('fatal');
+    if(loaderEl) loaderEl.style.display='none';
+    document.getElementById('fatalTitle').textContent=title;
+    document.getElementById('fatalCopy').textContent=copy;
+    document.getElementById('fatalDetails').textContent=details;
+    fatalEl.style.display='grid';
+  };
+
+  document.getElementById('retryBtn').addEventListener('click',()=>location.reload());
+
+  const loadCss = (href) => {
+    if([...document.styleSheets].some(x=>x.href===href)) return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.crossOrigin='anonymous';
+    document.head.appendChild(link);
+  };
+
+  const loadScript = (src, timeoutMs=9000) => new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    let settled=false;
+    const timer=setTimeout(()=>{
+      if(settled) return; settled=true; script.remove(); reject(new Error('Tiempo agotado: '+src));
+    },timeoutMs);
+    script.src=src;
+    script.crossOrigin='anonymous';
+    script.onload=()=>{if(settled)return;settled=true;clearTimeout(timer);resolve(src)};
+    script.onerror=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();reject(new Error('No respondió: '+src))};
+    document.head.appendChild(script);
+  });
+
+  async function ensureMapLibre(){
+    if(window.maplibregl) return 'precargado';
+    const candidates=[
+      {js:'./vendor/maplibre-gl.js',css:'./vendor/maplibre-gl.css',name:'archivo local'},
+      {js:'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js',css:'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css',name:'jsDelivr'},
+      {js:'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js',css:'https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css',name:'unpkg'},
+      {js:'https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.js?v=0.1.9',css:'https://tiles.locationiq.com/v3/libs/maplibre-gl/5.24.0/maplibre-gl.css?v=0.1.9',name:'LocationIQ'}
+    ];
+    const errors=[];
+    for(const source of candidates){
+      try{
+        loadCss(source.css);
+        await loadScript(source.js);
+        if(window.maplibregl) return source.name;
+      }catch(err){errors.push(err.message)}
+    }
+    throw new Error(errors.join('\n'));
+  }
+
+  let engineSource='';
+  try{
+    engineSource=await ensureMapLibre();
+  }catch(err){
+    fatal(
+      'No se pudo cargar el motor 3D',
+      'La página sí está publicada, pero el navegador no pudo descargar MapLibre desde ninguna de las rutas de respaldo.',
+      'URL: '+location.href+'\n'+err.message+'\n\nSolución recomendada: publica esta versión mediante GitHub Actions para que MapLibre quede incluido dentro del mismo sitio.'
+    );
+    return;
+  }
 
   const CENTER = [-76.22805, 3.99557];
   const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -298,13 +365,16 @@
     }
   };
 
-  if(!window.maplibregl || !maplibregl.supported()){
-    $('#loader').style.display='none';
-    $('#fatal').style.display='grid';
+  if(!maplibregl.supported({failIfMajorPerformanceCaveat:false})){
+    fatal(
+      'WebGL no está disponible',
+      'MapLibre sí cargó, pero el navegador no pudo crear un contexto gráfico WebGL.',
+      'Motor: '+engineSource+'\nNavegador: '+navigator.userAgent+'\n\nEn Chrome abre chrome://settings/system, activa «Usar aceleración por hardware cuando esté disponible» y reinicia el navegador.'
+    );
     return;
   }
 
-  loader.set(15,'Cargando base satelital');
+  loader.set(15,'Cargando base satelital','Motor MapLibre cargado desde '+engineSource+'.');
 
   const style = {
     version: 8,
@@ -322,7 +392,8 @@
         type: 'raster-dem',
         url: 'https://tiles.mapterhorn.com/tilejson.json',
         tileSize: 512,
-        maxzoom: 14
+        maxzoom: 14,
+        encoding: 'terrarium'
       },
       ofm: {
         type: 'vector',
@@ -368,7 +439,9 @@
     }
   };
 
-  const map = new maplibregl.Map({
+  let map;
+  try {
+    map = new maplibregl.Map({
     container: 'map',
     style,
     center: CENTER,
@@ -383,7 +456,15 @@
     fadeDuration: REDUCED_MOTION ? 0 : 250,
     cooperativeGestures: false,
     renderWorldCopies: false
-  });
+    });
+  } catch (err) {
+    fatal(
+      'El motor 3D cargó, pero el mapa no pudo crearse',
+      'El navegador rechazó la inicialización gráfica o una opción del visor.',
+      String(err && (err.stack || err.message) || err)
+    );
+    return;
+  }
 
   map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:true,visualizePitch:true}), 'bottom-right');
   map.addControl(new maplibregl.FullscreenControl(), 'bottom-right');
@@ -653,9 +734,17 @@
     }
   });
 
+  let firstResourceError='';
   map.on('error',e=>{
-    console.warn('Map resource warning:',e?.error||e);
+    const err=e?.error||e;
+    console.warn('Map resource warning:',err);
+    if(!firstResourceError) firstResourceError=String(err?.message||err);
     if(!styleReady) $('#qualityText').textContent='conexión parcial';
+  });
+
+  map.on('terrain',()=>{
+    const t=$('#terrainText');
+    if(t) t.textContent='DEM 3D · activo';
   });
 
   map.on('move',()=>{
