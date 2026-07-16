@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <meta name="theme-color" content="#06172f" />
   <meta name="description" content="Experiencia geoespacial 3D inmersiva de San Pedro, Valle del Cauca, con cartografía satelital, relieve real y recorrido cinematográfico." />
-  <title>San Pedro 3D — Territorio real e inmersivo</title>
+  <title>San Pedro 3D — Experiencia cinematográfica y reconstrucción digital</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2716%27 fill=%27%2306172f%27/%3E%3Cpath d=%27M15 43 28 17l7 15 5-10 9 21z%27 fill=%27%23b9e2ff%27/%3E%3Ccircle cx=%2745%27 cy=%2717%27 r=%276%27 fill=%27%23f6c84f%27/%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
   <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
-  <link rel="preconnect" href="https://tiles.mapterhorn.com" crossorigin>
+  <link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
 
   <style>
     :root{
@@ -160,6 +160,30 @@
     .hud-keys{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
     .key{padding:5px 7px;border:1px solid rgba(255,255,255,.16);border-radius:7px;background:rgba(255,255,255,.06);font-size:8px}
 
+
+    /* Reconstrucción digital cinematográfica */
+    #reconstruction{position:fixed;inset:0;z-index:23;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s ease}
+    body.reconstructing #reconstruction{opacity:1;visibility:visible}
+    .recon-vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,transparent 22%,rgba(1,12,28,.16) 55%,rgba(1,10,25,.72) 100%)}
+    .recon-grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(122,211,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(122,211,255,.22) 1px,transparent 1px);background-size:52px 52px;perspective:700px;mask-image:radial-gradient(circle at center,#000 0,transparent 72%);animation:gridDrift 12s linear infinite}
+    .recon-scan{position:absolute;left:0;right:0;top:-18%;height:22%;background:linear-gradient(180deg,transparent,rgba(89,201,255,.08),rgba(149,226,255,.42),rgba(89,201,255,.08),transparent);filter:blur(1px);animation:scanTerritory 3.2s ease-in-out infinite}
+    .recon-target{position:absolute;left:50%;top:50%;width:min(38vw,420px);aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid rgba(178,230,255,.35);border-radius:50%;box-shadow:0 0 0 20px rgba(44,162,224,.045),0 0 0 55px rgba(44,162,224,.025),inset 0 0 55px rgba(96,202,255,.08);animation:targetPulse 2.4s ease-in-out infinite}
+    .recon-target:before,.recon-target:after{content:"";position:absolute;inset:12%;border:1px dashed rgba(215,244,255,.32);border-radius:50%;animation:targetSpin 14s linear infinite}.recon-target:after{inset:34%;border-style:solid;animation-direction:reverse;animation-duration:8s}
+    .recon-panel{position:absolute;left:24px;bottom:24px;width:min(430px,calc(100vw - 48px));padding:18px 19px 17px;border:1px solid rgba(176,227,255,.28);border-radius:20px;background:linear-gradient(145deg,rgba(3,22,48,.92),rgba(5,48,83,.78));box-shadow:0 25px 80px rgba(0,0,0,.42);backdrop-filter:blur(20px) saturate(1.2);pointer-events:auto}
+    .recon-kicker{font-size:8px;font-weight:900;letter-spacing:.2em;color:#8ed8ff;text-transform:uppercase}.recon-title{margin:6px 0 7px;font-size:clamp(18px,2.2vw,28px);font-weight:900;letter-spacing:-.025em}.recon-copy{font-size:9px;line-height:1.6;color:rgba(255,255,255,.65)}
+    .recon-status{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.recon-status span{padding:6px 8px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.055);font-size:7px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+    .recon-actions{display:flex;gap:7px;margin-top:13px}.recon-actions button{border:0;border-radius:10px;padding:9px 12px;font-size:8px;font-weight:900;letter-spacing:.06em;cursor:pointer}.recon-close{background:#fff;color:#082747}.recon-map{background:rgba(255,255,255,.09);color:#fff}
+    .recon-photo{position:absolute;right:24px;bottom:24px;width:min(31vw,440px);height:min(34vh,280px);border:1px solid rgba(255,255,255,.22);border-radius:22px;overflow:hidden;background:#06172f;box-shadow:0 25px 80px rgba(0,0,0,.45);opacity:0;transform:translateY(20px);transition:.5s ease}
+    .recon-photo.visible{opacity:1;transform:none}.recon-photo img{width:100%;height:100%;object-fit:cover;animation:kenBurns 10s ease-in-out infinite alternate}.recon-photo:after{content:"Referencia fotográfica";position:absolute;left:12px;bottom:10px;padding:6px 8px;border-radius:8px;background:rgba(2,17,38,.75);font-size:7px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    body.reconstructing .topbar{opacity:.34}.topbar{transition:opacity .35s ease}
+    @keyframes scanTerritory{0%{transform:translateY(0);opacity:0}18%{opacity:1}82%{opacity:1}100%{transform:translateY(620%);opacity:0}}
+    @keyframes gridDrift{to{background-position:52px 52px}}
+    @keyframes targetPulse{0%,100%{transform:translate(-50%,-50%) scale(.96);opacity:.68}50%{transform:translate(-50%,-50%) scale(1.03);opacity:1}}
+    @keyframes targetSpin{to{transform:rotate(360deg)}}
+    @keyframes kenBurns{from{transform:scale(1.02)}to{transform:scale(1.12) translate(-1.5%,-1%)}}
+    @media(max-width:760px){.recon-panel{left:10px;bottom:10px;width:calc(100vw - 20px)}.recon-photo{display:none}.recon-target{width:72vw}.recon-grid{background-size:38px 38px}}
+    @media(prefers-reduced-motion:reduce){.recon-grid,.recon-scan,.recon-target,.recon-target:before,.recon-target:after,.recon-photo img{animation:none!important}}
+
     #fatal{display:none;position:fixed;z-index:120;inset:0;place-items:center;padding:20px;background:#06172f}
     .fatal-card{width:min(600px,94vw);padding:30px;border:1px solid rgba(255,255,255,.16);border-radius:24px;background:#0a294e;box-shadow:var(--shadow)}
     .fatal-card h2{margin:0 0 10px;font-size:27px}
@@ -196,7 +220,7 @@
     <div class="loader-box">
       <div class="loader-seal">SP</div>
       <div class="loader-title">SAN PEDRO · TERRITORIO 3D</div>
-      <div id="loaderCopy" class="loader-copy">Conectando cartografía satelital, relieve y capas urbanas…</div>
+      <div id="loaderCopy" class="loader-copy">Preparando satélite, calles, edificios y recorrido cinematográfico…</div>
       <div class="progress"><i id="loaderBar"></i></div>
       <div class="loader-state"><span id="loaderStep">Inicializando motor geoespacial</span><span id="loaderPct">7%</span></div>
     </div>
@@ -204,6 +228,18 @@
 
   <div id="map" role="application" aria-label="Visor geoespacial 3D de San Pedro, Valle del Cauca"></div>
   <div id="cinematic"></div><div id="grain"></div><div id="sun-flare"></div>
+
+  <aside id="reconstruction" aria-live="polite">
+    <div class="recon-vignette"></div><div class="recon-grid"></div><div class="recon-scan"></div><div class="recon-target"></div>
+    <div class="recon-panel">
+      <div class="recon-kicker">Reconstrucción digital asistida</div>
+      <div id="reconTitle" class="recon-title">Analizando el territorio</div>
+      <div id="reconCopy" class="recon-copy">Vista procedural basada en cartografía pública, imágenes satelitales y geometrías disponibles. No sustituye una fotogrametría arquitectónica.</div>
+      <div class="recon-status"><span>Cartografía real</span><span>Volumen urbano</span><span>Escaneo visual</span><span id="reconAccuracy">Precisión cartográfica</span></div>
+      <div class="recon-actions"><button id="closeRecon" class="recon-close">VOLVER AL MAPA</button><button id="reconMaps" class="recon-map">ABRIR EN MAPS</button></div>
+    </div>
+    <figure id="reconPhoto" class="recon-photo"><img id="reconPhotoImg" alt="Referencia visual del lugar seleccionado"></figure>
+  </aside>
 
   <header class="topbar">
     <div class="brand">
@@ -218,6 +254,7 @@
       <button class="tool view-mode" data-view="hybrid" title="Satélite con calles y nombres"><span class="view-label">HÍBRIDA</span><span class="view-icon">⌁</span></button>
       <button class="tool view-mode" data-view="streets" title="Mapa de calles"><span class="view-label">CALLES</span><span class="view-icon">▦</span></button>
       <button class="tool secondary-action" id="placesBtn" title="Lugares emblemáticos">LUGARES</button>
+      <button class="tool secondary-action" id="reconBtn" title="Reconstrucción digital del lugar activo">RECONSTRUIR</button>
       <button class="tool secondary-action" id="lightBtn" title="Cambiar iluminación">LUZ DÍA</button>
       <span class="separator"></span>
       <button class="tool secondary-action" id="tourBtn">RECORRIDO</button>
@@ -234,7 +271,7 @@
         <h1>San Pedro<br>en profundidad.</h1>
         <p>Una experiencia cartográfica que utiliza imágenes satelitales, elevación digital y navegación tridimensional para presentar el municipio como un territorio vivo, no como una ilustración.</p>
         <div class="metrics">
-          <div class="metric"><b>DEM real</b><span>Relieve geográfico</span></div>
+          <div class="metric"><b>DEM estable</b><span>Terrarium PNG</span></div>
           <div class="metric"><b>OSM</b><span>Vías y edificios</span></div>
           <div class="metric"><b>WebGL</b><span>Render acelerado</span></div>
         </div>
@@ -397,8 +434,8 @@
   try{
     map=new maplibregl.Map({
       container:'map',style,center:CENTER,zoom:11.45,pitch:LOW_POWER?58:67,bearing:22,
-      minZoom:10,maxZoom:19,maxPitch:LOW_POWER?72:80,antialias:!LOW_POWER,
-      attributionControl:true,fadeDuration:LOW_POWER?0:180,renderWorldCopies:false,cooperativeGestures:false,refreshExpiredTiles:false
+      minZoom:9.5,maxZoom:22,maxPitch:LOW_POWER?76:85,antialias:!LOW_POWER,
+      attributionControl:true,fadeDuration:LOW_POWER?0:120,renderWorldCopies:false,cooperativeGestures:false,refreshExpiredTiles:false,pixelRatio:Math.min(devicePixelRatio||1,LOW_POWER?1.25:1.75)
     });
   }catch(err){fatal('No fue posible crear el visor','El motor cargó, pero el navegador rechazó la escena.',String(err?.stack||err));return;}
 
@@ -411,15 +448,15 @@
   setInteractions(false);
 
   let explore=false, currentView='satellite', dusk=false, currentScene=0;
-  let terrainSourceReady=false, terrainEnabled=false, urbanReady=false, placesOpen=false;
+  let terrainSourceReady=false, terrainEnabled=false, urbanReady=false, placesOpen=false, reconstructing=false, activePoiId='park';
   const markerById=new Map(), popupById=new Map(), poiById=new Map();
 
   const CORE_POIS=[
-    {id:'park',short:'Parque principal',name:'Parque principal de San Pedro',type:'Espacio público y cultura',icon:'◎',coords:[-76.22803,3.99550],zoom:18.0,pitch:55,bearing:20,description:'Parque de trazado circular, corazón urbano de San Pedro y entorno del Monumento a la Música.',image:'assets/san_pedro_parque.jpg'},
-    {id:'music',short:'Monumento a la Música',name:'Monumento a la Música',type:'Identidad cultural',icon:'♫',coords:[-76.22801,3.99554],zoom:18.25,pitch:52,bearing:-18,description:'Homenaje a la tradición musical sampedreña ubicado en el parque principal.',image:'assets/san_pedro_parque.jpg'},
-    {id:'church',short:'Iglesia San Pedro Apóstol',name:'Parroquia San Pedro Apóstol',type:'Patrimonio religioso',icon:'✦',coords:[-76.22825,3.99576],zoom:18.35,pitch:60,bearing:28,description:'Iglesia parroquial de una torre ubicada en el entorno inmediato de la plaza principal.'},
-    {id:'townhall',short:'Alcaldía Municipal',name:'Alcaldía Municipal de San Pedro',type:'Institucional',icon:'▤',coords:[-76.22766,3.99531],zoom:18.2,pitch:58,bearing:-34,description:'Sede administrativa municipal y punto central de atención institucional.'},
-    {id:'carrera6',short:'Carrera 6 · Avenida',name:'Carrera 6 y zona comercial',type:'Vida urbana',icon:'↕',coords:[-76.22802,3.99445],zoom:17.65,pitch:48,bearing:0,description:'Eje urbano donde se concentra una parte importante del comercio, transporte y movimiento cotidiano.'}
+    {id:'park',short:'Parque principal',name:'Parque principal de San Pedro',type:'Espacio público y cultura',icon:'◎',coords:[-76.22803,3.99550],zoom:19.35,pitch:58,bearing:20,description:'Parque de trazado circular, corazón urbano de San Pedro y entorno del Monumento a la Música.',image:'assets/san_pedro_parque.jpg'},
+    {id:'music',short:'Monumento a la Música',name:'Monumento a la Música',type:'Identidad cultural',icon:'♫',coords:[-76.22801,3.99554],zoom:19.55,pitch:60,bearing:-18,description:'Homenaje a la tradición musical sampedreña ubicado en el parque principal.',image:'assets/san_pedro_parque.jpg'},
+    {id:'church',short:'Iglesia San Pedro Apóstol',name:'Parroquia San Pedro Apóstol',type:'Patrimonio religioso',icon:'✦',coords:[-76.22825,3.99576],zoom:19.45,pitch:64,bearing:28,description:'Iglesia parroquial de una torre ubicada en el entorno inmediato de la plaza principal.'},
+    {id:'townhall',short:'Alcaldía Municipal',name:'Alcaldía Municipal de San Pedro',type:'Institucional',icon:'▤',coords:[-76.22766,3.99531],zoom:19.4,pitch:62,bearing:-34,description:'Sede administrativa municipal y punto central de atención institucional.'},
+    {id:'carrera6',short:'Carrera 6 · Avenida',name:'Carrera 6 y zona comercial',type:'Vida urbana',icon:'↕',coords:[-76.22802,3.99445],zoom:19.0,pitch:54,bearing:0,description:'Eje urbano donde se concentra una parte importante del comercio, transporte y movimiento cotidiano.'}
   ];
   CORE_POIS.forEach(p=>poiById.set(p.id,p));
 
@@ -445,28 +482,33 @@
     if(terrainSourceReady||LOW_POWER&&MOBILE)return;
     terrainSourceReady=true;
     try{
-      map.addSource('terrain',{type:'raster-dem',url:'https://tiles.mapterhorn.com/tilejson.json',tileSize:512,maxzoom:13,encoding:'terrarium'});
-      if(!LOW_POWER) map.addLayer({id:'hillshade',type:'hillshade',source:'terrain',maxzoom:14.6,paint:{'hillshade-exaggeration':.2,'hillshade-shadow-color':'#0a1c19','hillshade-highlight-color':'#fff1c9','hillshade-accent-color':'#2c4a3c','hillshade-illumination-direction':315}},'labels');
+      const demTiles=['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'];
+      // Fuentes separadas: evita el aviso de MapLibre y permite ajustes independientes.
+      map.addSource('terrain-dem',{type:'raster-dem',tiles:demTiles,tileSize:256,maxzoom:13,encoding:'terrarium',attribution:'Elevation © Mapzen / AWS Open Data'});
+      map.addSource('hillshade-dem',{type:'raster-dem',tiles:demTiles,tileSize:256,maxzoom:13,encoding:'terrarium'});
+      if(!LOW_POWER) map.addLayer({id:'hillshade',type:'hillshade',source:'hillshade-dem',maxzoom:14.1,paint:{'hillshade-exaggeration':.16,'hillshade-shadow-color':'#071915','hillshade-highlight-color':'#fff4d2','hillshade-accent-color':'#315443','hillshade-illumination-direction':315}},'labels');
       updateTerrainForZoom();
-      $('#terrainText').textContent='DEM 3D · optimizado';
-    }catch(err){terrainSourceReady=false;$('#terrainText').textContent='Relieve · satelital';console.warn('Terrain:',err);}
+      $('#terrainText').textContent='DEM PNG · estable';
+    }catch(err){terrainSourceReady=false;$('#terrainText').textContent='Relieve · no disponible';console.warn('Terrain:',err);}
   }
   function updateTerrainForZoom(){
     if(!terrainSourceReady)return;
-    const shouldEnable=map.getZoom()<14.7 && !MOBILE;
-    if(shouldEnable&&!terrainEnabled){map.setTerrain({source:'terrain',exaggeration:LOW_POWER?.62:.92});terrainEnabled=true;}
+    // El DEM global tiene resolución útil para el territorio, no para fachadas urbanas.
+    const shouldEnable=map.getZoom()<14.15 && !MOBILE && !reconstructing;
+    if(shouldEnable&&!terrainEnabled){map.setTerrain({source:'terrain-dem',exaggeration:LOW_POWER?.56:.82});terrainEnabled=true;}
     else if(!shouldEnable&&terrainEnabled){map.setTerrain(null);terrainEnabled=false;}
     if(map.getLayer('hillshade'))setLayerVisible('hillshade',shouldEnable&&currentView!=='streets');
   }
 
   async function ensureUrbanLayers(){
-    if(urbanReady||LOW_POWER)return;
+    if(urbanReady)return;
     urbanReady=true;
     try{
       map.addSource('ofm',{type:'vector',url:'https://tiles.openfreemap.org/planet',attribution:'© OpenStreetMap contributors · OpenFreeMap'});
-      map.addLayer({id:'roads-shadow',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.5,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':'rgba(3,18,32,.65)','line-width':['interpolate',['linear'],['zoom'],13.5,1,17,8],'line-blur':1,'line-opacity':.45}},'labels');
-      map.addLayer({id:'roads',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.5,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':['match',['get','class'],['motorway','trunk','primary','secondary'],'#f4dfaa','#ece7dc'],'line-width':['interpolate',['linear'],['zoom'],13.5,.5,17,4.2],'line-opacity':.78}},'labels');
-      map.addLayer({id:'buildings-3d',type:'fill-extrusion',source:'ofm','source-layer':'building',minzoom:15.25,layout:{visibility:'none'},paint:{'fill-extrusion-color':'#ddd0c1','fill-extrusion-height':['coalesce',['to-number',['get','render_height']],['*',['coalesce',['to-number',['get','levels']],2],3],5.5],'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],0],'fill-extrusion-opacity':['interpolate',['linear'],['zoom'],15.25,0,16,.68,18,.88],'fill-extrusion-vertical-gradient':true}});
+      map.addLayer({id:'building-footprints',type:'fill',source:'ofm','source-layer':'building',minzoom:14.2,layout:{visibility:'none'},paint:{'fill-color':['case',['boolean',['feature-state','selected'],false],'#68d4ff','#e7ded2'],'fill-opacity':['interpolate',['linear'],['zoom'],14.2,.22,17,.46,20,.66],'fill-outline-color':'rgba(15,57,82,.32)'}},'labels');
+      map.addLayer({id:'roads-shadow',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.2,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':'rgba(3,18,32,.68)','line-width':['interpolate',['linear'],['zoom'],13.2,.8,17,7,20,14],'line-blur':.65,'line-opacity':.42}},'labels');
+      map.addLayer({id:'roads',type:'line',source:'ofm','source-layer':'transportation',minzoom:13.2,layout:{'line-cap':'round','line-join':'round',visibility:'none'},paint:{'line-color':['match',['get','class'],['motorway','trunk','primary','secondary'],'#ffe5a8','#f5f0e7'],'line-width':['interpolate',['linear'],['zoom'],13.2,.45,17,3.8,20,8.5],'line-opacity':.84}},'labels');
+      if(!LOW_POWER)map.addLayer({id:'buildings-3d',type:'fill-extrusion',source:'ofm','source-layer':'building',minzoom:15.1,layout:{visibility:'none'},filter:['!=',['get','hide_3d'],true],paint:{'fill-extrusion-color':['interpolate',['linear'],['zoom'],15.1,'#d7cbbd',18,'#e8dfd5',21,'#f5eee8'],'fill-extrusion-height':['interpolate',['linear'],['zoom'],15.1,0,16,['coalesce',['to-number',['get','render_height']],['*',['coalesce',['to-number',['get','levels']],2],3],5.5]],'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],0],'fill-extrusion-opacity':['interpolate',['linear'],['zoom'],15.1,0,16,.62,19,.88],'fill-extrusion-vertical-gradient':true}});
       applyViewLayers();
     }catch(err){urbanReady=false;console.warn('Urban layers:',err);}
   }
@@ -481,10 +523,11 @@
       map.setPaintProperty('satellite','raster-contrast',hybrid?.13:.08);
       map.setPaintProperty('satellite','raster-brightness-max',dusk?.73:(hybrid?.84:.94));
     }
-    const showVectors=urbanReady&&(hybrid||streets);
-    setLayerVisible('roads-shadow',showVectors&&map.getZoom()>=14.2);
-    setLayerVisible('roads',showVectors&&map.getZoom()>=14.2);
-    setLayerVisible('buildings-3d',urbanReady&&map.getZoom()>=15.25);
+    const showVectors=urbanReady&&(hybrid||streets||reconstructing);
+    setLayerVisible('building-footprints',showVectors&&map.getZoom()>=14.2);
+    setLayerVisible('roads-shadow',showVectors&&map.getZoom()>=13.6);
+    setLayerVisible('roads',showVectors&&map.getZoom()>=13.6);
+    setLayerVisible('buildings-3d',urbanReady&&showVectors&&map.getZoom()>=15.1);
     $('#baseText').textContent=streets?'Calles y edificaciones':hybrid?'Satélite + nombres':'Imagen satelital';
     updateTerrainForZoom();
   }
@@ -506,25 +549,25 @@
   function setExplore(on){
     explore=on;document.body.classList.toggle('explore',on);$('#exploreBtn').classList.toggle('active',on);setInteractions(on);
     $('#exploreBtn').textContent=on?'EXPLORANDO':'EXPLORAR';
-    if(on){setView('hybrid');map.easeTo({center:CENTER,zoom:15.35,pitch:LOW_POWER?38:58,bearing:8,duration:REDUCED_MOTION?0:1000,essential:true});}
+    if(on){setView('hybrid');map.easeTo({center:CENTER,zoom:16.1,pitch:LOW_POWER?40:60,bearing:8,duration:REDUCED_MOTION?0:1000,essential:true});map.scrollZoom?.setWheelZoomRate?.(1/420);map.scrollZoom?.setZoomRate?.(1/85);}
   }
   $('#exploreBtn').addEventListener('click',()=>setExplore(!explore));
   $('#exitExplore').addEventListener('click',()=>setExplore(false));
   $('#tourBtn').addEventListener('click',()=>{setExplore(false);scrollTo({top:0,behavior:REDUCED_MOTION?'auto':'smooth'});});
-  addEventListener('keydown',e=>{if(e.key==='Escape'&&explore)setExplore(false)});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&reconstructing)stopReconstruction();else if(e.key==='Escape'&&explore)setExplore(false)});
 
   function mapsUrl(p){return `https://www.google.com/maps/search/?api=1&query=${p.coords[1]},${p.coords[0]}`;}
   function panoUrl(p){return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.coords[1]},${p.coords[0]}`;}
   function popupHTML(p){
     const photo=p.image?`<div class="popup-photo" style="background-image:url('${p.image}')"></div>`:'';
-    return `<div class="popup">${photo}<div class="popup-body"><div class="popup-type">${p.type}</div><h3>${p.name}</h3><p>${p.description}</p><div class="popup-actions"><button data-poi-focus="${p.id}">ACERCAR</button><a class="light" href="${mapsUrl(p)}" target="_blank" rel="noopener">MAPS</a><a class="light" href="${panoUrl(p)}" target="_blank" rel="noopener">360°</a></div></div></div>`;
+    return `<div class="popup">${photo}<div class="popup-body"><div class="popup-type">${p.type}</div><h3>${p.name}</h3><p>${p.description}</p><div class="popup-actions"><button data-poi-focus="${p.id}">ACERCAR</button><button data-poi-recon="${p.id}">RECONSTRUIR</button><a class="light" href="${mapsUrl(p)}" target="_blank" rel="noopener">MAPS</a><a class="light" href="${panoUrl(p)}" target="_blank" rel="noopener">360°</a></div></div></div>`;
   }
   function createMarker(p){
     if(markerById.has(p.id))return;
     const el=document.createElement('button');el.className='poi-marker';el.type='button';el.innerHTML='<span class="poi-pin"></span><span class="poi-label">'+p.short+'</span>';el.setAttribute('aria-label',p.name);
     const popup=new maplibregl.Popup({offset:22,maxWidth:'270px',closeButton:true}).setHTML(popupHTML(p));
     const marker=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(p.coords).setPopup(popup).addTo(map);
-    popup.on('open',()=>setTimeout(()=>{const btn=document.querySelector(`[data-poi-focus="${p.id}"]`);if(btn)btn.onclick=()=>focusPOI(p.id,true);},0));
+    popup.on('open',()=>setTimeout(()=>{const btn=document.querySelector(`[data-poi-focus="${p.id}"]`);if(btn)btn.onclick=()=>focusPOI(p.id,true);const recon=document.querySelector(`[data-poi-recon="${p.id}"]`);if(recon)recon.onclick=()=>startReconstruction(p.id);},0));
     markerById.set(p.id,marker);popupById.set(p.id,popup);
   }
   CORE_POIS.forEach(createMarker);
@@ -541,21 +584,37 @@
   function togglePlaces(force){placesOpen=typeof force==='boolean'?force:!placesOpen;$('#poi-panel').classList.toggle('open',placesOpen);$('#placesBtn').classList.toggle('active',placesOpen);}
   $('#placesBtn').addEventListener('click',()=>togglePlaces());$('#closePlaces').addEventListener('click',()=>togglePlaces(false));
 
+  function stopReconstruction(){
+    reconstructing=false;document.body.classList.remove('reconstructing');$('#reconBtn').classList.remove('active');$('#reconPhoto').classList.remove('visible');updateTerrainForZoom();applyViewLayers();
+  }
+  async function startReconstruction(id=activePoiId){
+    const p=poiById.get(id)||poiById.get('park');if(!p)return;
+    activePoiId=p.id;reconstructing=true;document.body.classList.add('reconstructing');$('#reconBtn').classList.add('active');
+    $('#reconTitle').textContent=p.name;$('#reconCopy').textContent=`Reconstrucción visual basada en la posición real de ${p.short}, la imagen satelital, las calles y los volúmenes registrados en OpenStreetMap. Para una réplica arquitectónica exacta se requieren fotografías o dron.`;
+    $('#reconMaps').onclick=()=>open(mapsUrl(p),'_blank','noopener');
+    const photo=$('#reconPhoto'),img=$('#reconPhotoImg');if(p.image){img.src=p.image;photo.classList.add('visible')}else photo.classList.remove('visible');
+    setExplore(true);await setView('hybrid');await ensureUrbanLayers();togglePlaces(false);updateTerrainForZoom();applyViewLayers();
+    map.flyTo({center:p.coords,zoom:Math.min(20.25,(p.zoom||19.4)+.45),pitch:LOW_POWER?48:70,bearing:(p.bearing??18)-18,speed:LOW_POWER?.9:.62,curve:1.48,maxDuration:REDUCED_MOTION?0:3200,essential:true});
+    if(!LOW_POWER&&!REDUCED_MOTION)map.once('moveend',()=>{if(!reconstructing)return;map.easeTo({bearing:(p.bearing??18)+24,pitch:73,duration:1900,easing:t=>t*(2-t),essential:true});});
+  }
+  $('#closeRecon').addEventListener('click',stopReconstruction);
+  $('#reconBtn').addEventListener('click',()=>reconstructing?stopReconstruction():startReconstruction(activePoiId));
+
   async function focusPOI(id,openPopup=false){
-    const p=poiById.get(id);if(!p)return;
-    setExplore(true);await setView('streets');togglePlaces(false);
+    const p=poiById.get(id);if(!p)return;activePoiId=id;stopReconstruction();
+    setExplore(true);await setView('streets');await ensureUrbanLayers();togglePlaces(false);
     $$('.poi-item').forEach(x=>x.classList.toggle('active',x.dataset.poi===id));
-    map.easeTo({center:p.coords,zoom:p.zoom||17.6,pitch:LOW_POWER?34:(p.pitch??52),bearing:p.bearing??18,duration:REDUCED_MOTION?0:1250,easing:t=>1-Math.pow(1-t,3),essential:true});
-    if(openPopup)setTimeout(()=>markerById.get(id)?.togglePopup(),REDUCED_MOTION?20:900);
+    map.flyTo({center:p.coords,zoom:p.zoom||19.25,pitch:LOW_POWER?42:(p.pitch??60),bearing:p.bearing??18,speed:LOW_POWER?1:.7,curve:1.35,maxDuration:REDUCED_MOTION?0:2600,essential:true});
+    if(openPopup)setTimeout(()=>markerById.get(id)?.togglePopup(),REDUCED_MOTION?20:1700);
   }
 
   async function focusScene(index){
     if(explore)return;
-    updateSceneUI(index);
+    stopReconstruction();updateSceneUI(index);
     const s=scenes[index];
     await setView(s.view||'satellite');
     if(index>=1)ensureUrbanLayers();
-    map.easeTo({center:s.center,zoom:s.zoom,pitch:s.pitch,bearing:s.bearing,duration:REDUCED_MOTION?0:(LOW_POWER?900:1400),easing:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,essential:true});
+    map.flyTo({center:s.center,zoom:s.zoom,pitch:s.pitch,bearing:s.bearing,speed:LOW_POWER?1.05:.72,curve:1.38,maxDuration:REDUCED_MOTION?0:(LOW_POWER?1300:2800),essential:true});
     if(index>=2){const id=index===2?'park':index===3?'church':'townhall';setTimeout(()=>{if(!explore&&!popupById.get(id)?.isOpen())markerById.get(id)?.togglePopup();},LOW_POWER?550:1000);}
   }
 
@@ -593,12 +652,12 @@
     loader.set(92,'Optimizando experiencia',LOW_POWER?'Se redujeron efectos y capas pesadas para mejorar la fluidez.':'Las capas avanzadas se cargarán únicamente cuando sean necesarias.');
     loader.done();
     $('#qualityDot').classList.add('ok');$('#qualityText').textContent=LOW_POWER?'modo fluido':'cinemático';
-    $('#terrainText').textContent=LOW_POWER&&MOBILE?'Relieve · ligero':'DEM 3D · progresivo';
+    $('#terrainText').textContent=LOW_POWER&&MOBILE?'Relieve · ligero':'Relieve PNG · progresivo';
   });
   map.on('zoomend',()=>{updateTerrainForZoom();applyViewLayers();});
   map.on('moveend',()=>{const c=map.getCenter();$('#coordText').textContent=`${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}`;});
   map.on('zoom',()=>{const compact=map.getZoom()<14.6;markerById.forEach(m=>m.getElement().classList.toggle('compact',compact));});
-  map.on('error',e=>console.warn('Recurso cartográfico:',e?.error||e));
+  map.on('error',e=>{const msg=String(e?.error?.message||e?.error||e);if(/AbortError|cancelled|Canceled/i.test(msg))return;console.warn('Recurso cartográfico:',e?.error||e);});
 })();
 </script>
 </body>
